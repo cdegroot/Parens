@@ -71,4 +71,32 @@ class ElementaryFunctions extends FlatSpecForParsers with ElementaryFunctionPars
     evaluating { parsing("car[cdr[(A . B)]]") } should produce [Exception]
     parsing("car[cons[A;B]]") should equal(Atom("A"))
   }
+  
+  // "If x and y represent any two S-expressions...."
+  they should "handle variables" in {
+    implicit val parserToTest = funOrSexp
+    
+    parsing("car[cons[x;y]]") should equal(Var("x"))
+    parsing("cdr[cons[x;y]]") should equal(Var("y"))
+  }
+  
+  // "The predicate eq is a test for equality on atomic symbols..."
+  they should "parse eq" in {
+    implicit val parserToTest = eqPredicate
+    
+    parsing("eq[A;A]") should equal(T)
+    parsing("eq[A;B]") should equal(F)
+    evaluating { parsing("eq[A;(A . B)]") } should produce [Exception]
+    evaluating { parsing("eq[(A . B);(A . B)") } should produce [Exception]
+  }
+  
+  // "The predicate atom is true if its argument is an atomic symbol..."
+  they should "parse atom" in {
+    implicit val parserToTest = atomPredicate
+    
+    parsing("atom[EXTRALONGSTRINGOFLETTERS]") should equal(T)
+    parsing("atom[(U . V)]") should equal(F)
+    parsing("atom[car[(U . V)]]") should equal(T)
+  }
+  
 }
