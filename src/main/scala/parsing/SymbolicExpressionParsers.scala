@@ -1,6 +1,6 @@
 package parsing
 import scala.util.parsing.combinator.RegexParsers
-import parsing.SymbolicExpressionAst._
+import parsing.Tokens._
 
 trait SymbolicExpressionParsers extends RegexParsers {
 

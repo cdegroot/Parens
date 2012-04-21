@@ -1,5 +1,5 @@
 package parsing
-import parsing.SymbolicExpressionAst._
+import parsing.Tokens._
 
 class ParsingSymbolicExpressions extends FlatSpecForParsers with SymbolicExpressionParsers {
 
@@ -44,40 +44,40 @@ class ElementaryFunctions extends FlatSpecForParsers with ElementaryFunctionPars
   "The elementary function parsers" should "parse cons" in {
     implicit val parserToTest = cons
     
-    parsing("cons[A;B]") should equal(Sexp(Atom("A"), Atom("B")))
-    parsing("cons[(A . B);C]") should equal(Sexp(Sexp(Atom("A"),Atom("B")),Atom("C")))
-    parsing("cons[cons[A;B];C]") should equal(Sexp(Sexp(Atom("A"),Atom("B")),Atom("C")))
+    parsing("cons[A;B]").eval should equal(Sexp(Atom("A"), Atom("B")))
+    parsing("cons[(A . B);C]").eval should equal(Sexp(Sexp(Atom("A"),Atom("B")),Atom("C")))
+    parsing("cons[cons[A;B];C]").eval should equal(Sexp(Sexp(Atom("A"),Atom("B")),Atom("C")))
   }
   
   // "The function car has one argument..."
   they should "parse car" in {
     implicit val parserToTest = car
     
-    parsing("car[(A . B)]") should equal(Atom("A"))
-    parsing("car[(A . (B1 . B2))]") should equal(Atom("A"))
-    parsing("car[((A1 . A2) . B)]") should equal(Sexp(Atom("A1"), Atom("A2")))
-    evaluating { parsing("car[A]") } should produce [Exception]
+    parsing("car[(A . B)]").eval should equal(Atom("A"))
+    parsing("car[(A . (B1 . B2))]").eval should equal(Atom("A"))
+    parsing("car[((A1 . A2) . B)]").eval should equal(Sexp(Atom("A1"), Atom("A2")))
+    evaluating { parsing("car[A]").eval } should produce [Exception]
   }
   
   // "The function cdr has one argument..."
   they should "parse cdr" in {
     implicit val parserToTest = funOrSexp // should be cdr but examples in book use other funs as well
     
-    parsing("cdr[(A . B)]") should equal(Atom("B"))
-    parsing("cdr[(A . (B1 . B2))]") should equal(Sexp(Atom("B1"), Atom("B2")))
-    parsing("cdr[((A1 . A2) . B)]") should equal(Atom("B"))
-    evaluating { parsing("cdr[A]") } should produce [Exception]
-    parsing("car[cdr[(A . (B1 . B2))]]") should equal(Atom("B1"))
-    evaluating { parsing("car[cdr[(A . B)]]") } should produce [Exception]
-    parsing("car[cons[A;B]]") should equal(Atom("A"))
+    parsing("cdr[(A . B)]").eval should equal(Atom("B"))
+    parsing("cdr[(A . (B1 . B2))]").eval should equal(Sexp(Atom("B1"), Atom("B2")))
+    parsing("cdr[((A1 . A2) . B)]").eval should equal(Atom("B"))
+    evaluating { parsing("cdr[A]").eval } should produce [Exception]
+    parsing("car[cdr[(A . (B1 . B2))]]").eval should equal(Atom("B1"))
+    evaluating { parsing("car[cdr[(A . B)]]").eval } should produce [Exception]
+    parsing("car[cons[A;B]]").eval should equal(Atom("A"))
   }
   
   // "If x and y represent any two S-expressions...."
   they should "handle variables" in {
     implicit val parserToTest = funOrSexp
     
-    parsing("car[cons[x;y]]") should equal(Var("x"))
-    parsing("cdr[cons[x;y]]") should equal(Var("y"))
+    parsing("car[cons[x;y]]").eval should equal(Var("x"))
+    parsing("cdr[cons[x;y]]").eval should equal(Var("y"))
   }
   
   // "The predicate eq is a test for equality on atomic symbols..."
@@ -94,9 +94,9 @@ class ElementaryFunctions extends FlatSpecForParsers with ElementaryFunctionPars
   they should "parse atom" in {
     implicit val parserToTest = atomPredicate
     
-    parsing("atom[EXTRALONGSTRINGOFLETTERS]") should equal(T)
-    parsing("atom[(U . V)]") should equal(F)
-    parsing("atom[car[(U . V)]]") should equal(T)
+    parsing("atom[EXTRALONGSTRINGOFLETTERS]").eval should equal(T)
+    parsing("atom[(U . V)]").eval should equal(F)
+    parsing("atom[car[(U . V)]]").eval should equal(T)
   }  
 }
 
@@ -120,20 +120,20 @@ class ParsingListNotation extends FlatSpecForParsers with ElementaryFunctionPars
   "The elementary function parsers" should "handle list notation" in {
     implicit val parserToTest = funOrSexp
     
-    parsing("car[(A B C)]") should equal(Atom("A"))
-    parsing("cdr[(A B C)]") should equal(parsing("(B C)"))
-    parsing("cons[A;(B C)]") should equal(parsing("(A B C)"))
-    parsing("car[((A B) C)]") should equal(parsing("(A B)"))
-    parsing("cdr[(A)]") should equal(NIL)
-    parsing("car[cdr[(A B C)]]") should equal(Atom("B"))
+    parsing("car[(A B C)]").eval should equal(Atom("A"))
+    parsing("cdr[(A B C)]").eval should equal(parsing("(B C)"))
+    parsing("cons[A;(B C)]").eval should equal(parsing("(A B C)"))
+    parsing("car[((A B) C)]").eval should equal(parsing("(A B)"))
+    parsing("cdr[(A)]").eval should equal(NIL)
+    parsing("car[cdr[(A B C)]]").eval should equal(Atom("B"))
   }
 
   they should "handle compound head/tail functions" in {
     implicit val parserToTest = funOrSexp
     
-    parsing("cadr[(A B C)]") should equal(Atom("B"))
-    parsing("caddr[(A B C)]") should equal(Atom("C"))
-    parsing("cadadr[(A (B C) D)]") should equal(Atom("C"))
+    parsing("cadr[(A B C)]").eval should equal(Atom("B"))
+    parsing("caddr[(A B C)]").eval should equal(Atom("C"))
+    parsing("cadadr[(A (B C) D)]").eval should equal(Atom("C"))
   }
   
 }
