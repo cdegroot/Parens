@@ -1,0 +1,1 @@
+foo[x] = [eq[car[x];A]->cons[B;cdr[x]]; T->x]
