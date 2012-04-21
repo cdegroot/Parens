@@ -10,6 +10,7 @@ object SymbolicExpressionAst {
 	
 	val T = Atom("T")
 	val F = Atom("F")
+	val NIL = Atom("NIL")
 	
 	case class Var(name: String) extends Token	
 }

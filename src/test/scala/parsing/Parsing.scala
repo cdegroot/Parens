@@ -97,6 +97,23 @@ class ElementaryFunctions extends FlatSpecForParsers with ElementaryFunctionPars
     parsing("atom[EXTRALONGSTRINGOFLETTERS]") should equal(T)
     parsing("atom[(U . V)]") should equal(F)
     parsing("atom[car[(U . V)]]") should equal(T)
-  }
+  }  
+}
+
+class ParsingListNotation extends FlatSpecForParsers with SymbolicExpressionParsers {
   
+  //
+  // Section 1.3 : List notation
+  //
+  
+  "The Sexp parsers" should "parse list notation with spaces" in {
+    implicit val parserToTest = sexp
+    
+    parsing("(A B C)") should equal(parsing("(A . (B . (C . NIL)))"))
+    parsing("((A B) C)") should equal(parsing("((A . (B . NIL)) . (C . NIL))"))
+    parsing("(A B (C D))") should equal(parsing("(A . (B . ((C . (D . NIL)) . NIL)))"))
+    parsing("(A)") should equal(parsing("(A . NIL)"))
+    parsing("((A))") should equal(parsing("((A . NIL) . NIL)"))
+    parsing("(A (B . C))") should equal(parsing("(A . ((B . C) . NIL))"))
+  }
 }
