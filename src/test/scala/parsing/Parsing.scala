@@ -128,5 +128,12 @@ class ParsingListNotation extends FlatSpecForParsers with ElementaryFunctionPars
     parsing("car[cdr[(A B C)]]") should equal(Atom("B"))
   }
 
+  they should "handle compound head/tail functions" in {
+    implicit val parserToTest = funOrSexp
+    
+    parsing("cadr[(A B C)]") should equal(Atom("B"))
+    parsing("caddr[(A B C)]") should equal(Atom("C"))
+    parsing("cadadr[(A (B C) D)]") should equal(Atom("C"))
+  }
   
 }
