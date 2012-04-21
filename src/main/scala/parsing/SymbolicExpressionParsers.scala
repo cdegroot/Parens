@@ -4,5 +4,7 @@ import parsing.SymbolicExpressionAst._
 
 trait SymbolicExpressionParsers extends RegexParsers {
 
-  def atom = regex("[A-Z][A-Z0-9]*"r) ^^ { new Atom(_) }
+  def sexp: Parser[BaseSexp] = "(" ~> sexp ~ "." ~ sexp <~ ")" ^^ { case x~dot~y => Sexp(x, y) } | atom
+  
+  def atom: Parser[Atom]  = regex("[A-Z][A-Z0-9]*"r) ^^ { new Atom(_) }
 }
