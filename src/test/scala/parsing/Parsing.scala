@@ -100,13 +100,13 @@ class ElementaryFunctions extends FlatSpecForParsers with ElementaryFunctionPars
   }  
 }
 
-class ParsingListNotation extends FlatSpecForParsers with SymbolicExpressionParsers {
+class ParsingListNotation extends FlatSpecForParsers with ElementaryFunctionParsers {
   
   //
   // Section 1.3 : List notation
   //
   
-  "The Sexp parsers" should "parse list notation with spaces" in {
+  "The Sexp parsers" should "parse list notation" in {
     implicit val parserToTest = sexp
     
     parsing("(A B C)") should equal(parsing("(A . (B . (C . NIL)))"))
@@ -116,4 +116,17 @@ class ParsingListNotation extends FlatSpecForParsers with SymbolicExpressionPars
     parsing("((A))") should equal(parsing("((A . NIL) . NIL)"))
     parsing("(A (B . C))") should equal(parsing("(A . ((B . C) . NIL))"))
   }
+  
+  "The elementary function parsers" should "handle list notation" in {
+    implicit val parserToTest = funOrSexp
+    
+    parsing("car[(A B C)]") should equal(Atom("A"))
+    parsing("cdr[(A B C)]") should equal(parsing("(B C)"))
+    parsing("cons[A;(B C)]") should equal(parsing("(A B C)"))
+    parsing("car[((A B) C)]") should equal(parsing("(A B)"))
+    parsing("cdr[(A)]") should equal(NIL)
+    parsing("car[cdr[(A B C)]]") should equal(Atom("B"))
+  }
+
+  
 }
