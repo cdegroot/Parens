@@ -19,3 +19,7 @@ OBTW - I decided to use the original typography. In the macos/ directory,
 there is a keyboard layout that maps alt-l to the lambda and alt-a to the
 right arrow. 
 
+OBTW2 - No, I don't know where this is going to. I'm just trying to 
+make tests pass here, where the input of the tests is all the various
+examples in the manual :)
+
