@@ -11,7 +11,7 @@ trait MetaLanguageParsers extends ElementaryFunctionParsers {
     case conditionals => Cond(conditionals)
   }
   
-  def singleConditional: Parser[CondElem] = funOrSexp ~ "->" ~ funOrSexp ^^ {
+  def singleConditional: Parser[CondElem] = funOrSexp ~ "→" ~ funOrSexp ^^ {
     case cond~sep~action => CondElem(cond, action)
   }
 }

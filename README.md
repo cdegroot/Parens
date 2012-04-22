@@ -14,3 +14,8 @@ halfway bearable :).
 This is on Github for my convenience, it is meant purely as an
 academic exercise for my own pleasure. If you can use the code,
 congrats, but at the moment do not expect support or something.
+
+OBTW - I decided to use the original typography. In the macos/ directory,
+there is a keyboard layout that maps alt-l to the lambda and alt-a to the
+right arrow. 
+
