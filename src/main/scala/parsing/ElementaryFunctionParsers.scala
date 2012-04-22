@@ -21,8 +21,7 @@ trait ElementaryFunctionParsers extends SymbolicExpressionParsers {
   } 
   
   def eqPredicate: Parser[Token] = "eq" ~ "[" ~> funOrSexp ~ ";" ~ funOrSexp <~ "]" ^^ {
-    							case Atom(x)~semicolon~Atom(y) => if (x.equals(y)) T else F 
-    							case _ => throw new Exception("eq[] only defined for atoms") }
+    							case left~semicolon~right => EqP(left, right) }
   
   def atomPredicate: Parser[Token] = "atom" ~ "[" ~> funOrSexp <~ "]" ^^ { case x => AtomP(x) }
   

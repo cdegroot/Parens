@@ -2,13 +2,16 @@ package parsing
 
 object Tokens {
   
-	sealed abstract class Token { 
-	  def eval: Token; 
-	  def bind(binding: Binding): Token 
+	sealed abstract class Token {
+	  def eval : Token
+	  def bind(binding: Binding) : Token
 	} 
 	
 	abstract class BaseSexp extends Token
-	case class Atom(name: String) extends BaseSexp { def eval = this; def bind(binding: Binding) = this }
+	case class Atom(name: String) extends BaseSexp {
+	  def eval = this; 
+	  def bind(binding: Binding) = this 
+	}
 	case class Sexp(car: Token, cdr: Token) extends BaseSexp {
 	  def eval = Sexp(car.eval, cdr.eval)
 	  def bind(binding: Binding) = Sexp(car.bind(binding), cdr.bind(binding)) 
@@ -65,7 +68,12 @@ object Tokens {
 
 	// elementary predicates
 	case class EqP(left: Token, right: Token) extends ElementaryFunction {
-	  def eval = if (left.eval.equals(right.eval)) T else F
+	  def eval = {
+	    if (!(left.isInstanceOf[Atom] && right.isInstanceOf[Atom])) {
+	      throw new Exception("eq is only defined for atoms")
+	    }
+	    if (left.eval.equals(right.eval)) T else F
+	  }
 	  def bind(binding: Binding) = EqP(left.bind(binding), right.bind(binding))
 	}
 	
@@ -74,5 +82,15 @@ object Tokens {
 	  def bind(binding: Binding) = AtomP(value.bind(binding))
 	}
 
+	// conditional expression
+	case class Cond(clauses: List[CondElem]) extends Token {
+	  def eval =  NIL
+	  def bind(binding: Binding) = NIL
+	}
+	
+	case class CondElem(condition: Token, action: Token) extends Token {
+	  def eval =  NIL
+	  def bind(binding: Binding) = NIL
+	}
 }
 

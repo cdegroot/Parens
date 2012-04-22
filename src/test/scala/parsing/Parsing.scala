@@ -84,10 +84,10 @@ class ElementaryFunctions extends FlatSpecForParsers with ElementaryFunctionPars
   they should "parse eq" in {
     implicit val parserToTest = eqPredicate
     
-    parsing("eq[A;A]") should equal(T)
-    parsing("eq[A;B]") should equal(F)
-    evaluating { parsing("eq[A;(A . B)]") } should produce [Exception]
-    evaluating { parsing("eq[(A . B);(A . B)") } should produce [Exception]
+    parsing("eq[A;A]").eval should equal(T)
+    parsing("eq[A;B]").eval should equal(F)
+    evaluating { parsing("eq[A;(A . B)]").eval } should produce [Exception]
+    evaluating { parsing("eq[(A . B);(A . B)").eval } should produce [Exception]
   }
   
   // "The predicate atom is true if its argument is an atomic symbol..."

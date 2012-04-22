@@ -21,4 +21,18 @@ class MetaLanguage extends FlatSpecForParsers with MetaLanguageParsers {
     
     fun.callWith(List(Binding("x", parsing("(A B C D)")(sexp)))) should equal(Atom("C"))
   }
+  
+  // "A conditional expression has the form..."
+  they should "parse conditional expressions" in {
+    implicit val parserToTest = conditionalExpression
+    
+    parsing("[eq[car[x];A]->cons[B;cdr[X]]; T->x]") should equal(
+        Cond(List(
+            CondElem(
+                EqP(CarOf(Var("x")),Atom("A")), 
+                Cons(Atom("B"),CdrOf(Atom("X")))), 
+            CondElem(
+                Atom("T"), 
+                Var("x")))))
+  }
 }
