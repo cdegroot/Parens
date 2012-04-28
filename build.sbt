@@ -4,6 +4,8 @@ version := "0.00000000000001"
 
 scalaVersion := "2.9.1"
 
+scalacOptions ++= Seq("-encoding", "UTF-8")
+
 libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest"        % "1.6.1" % "test",
     "org.jmock"      % "jmock"            % "2.5.1" % "test",
