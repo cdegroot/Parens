@@ -92,5 +92,17 @@ object Tokens {
 	  def eval =  NIL
 	  def bind(binding: Binding) = NIL
 	}
+	
+	// lambda notation
+	case class Lambda(args: List[Var], body: Token) extends Token {
+	  def eval = NIL
+	  def bind(binding: Binding) = NIL
+	}
+	
+	// a function call. I expect this to disappear, it's ugly ;-)
+	case class FunCall(name: String, args: List[Token]) extends Token {
+	  def eval = NIL
+	  def bind(binding: Binding) = NIL
+	}
 }
 

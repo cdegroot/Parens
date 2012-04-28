@@ -34,6 +34,38 @@ class MetaLanguage extends FlatSpecForParsers with MetaLanguageParsers {
                 Atom("T"), 
                 Var("x")))))
   }
+
+  // "Using the lambda notation, we can write..."
+  
+  // a problem with the parser of function calls in the lambda below, so first test that. 
+  they should "parse function calls" in {
+    parsing("ff[car[x]]")(functionCall) should equal(FunCall("ff", List(CarOf(Var("x")))))
+    parsing("ff[car[x]]")(funOrSexp) should equal(FunCall("ff", List(CarOf(Var("x")))))
+    parsing("[atom[x]→x; T→ff[car[x]]]")(conditionalExpression) should equal(
+    	Cond(List(
+                CondElem(
+                    AtomP(Var("x")),
+                    Var("x")),
+                CondElem(
+                    T,
+                    FunCall("ff", List(CarOf(Var("x"))))))))
+  }
+  
+  they should "parse lambda notation" in {
+    implicit val parserToTest = lambdaNotation;
+    val expr = "λ[[x];[atom[x]→x; T→ff[car[x]]]]"
+ 
+    (parsing(expr)) should equal(
+        Lambda(
+            List(Var("x")),
+            Cond(List(
+                CondElem(
+                    AtomP(Var("x")),
+                    Var("x")),
+                CondElem(
+                    T,
+                    FunCall("ff", List(CarOf(Var("x"))))))))) // <-- see? Lisp! ;-)
+  }
   
   // Next up: label[ff;λ[[x];[atom[x]→x; T→ff[car[x]]]]]
 }
