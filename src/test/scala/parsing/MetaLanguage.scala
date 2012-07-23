@@ -7,7 +7,7 @@ class MetaLanguage extends FlatSpecForParsers with MetaLanguageParsers {
   // Section 1.4 : The LISP Meta-language
   //
   
-  "The meta language parser" should "handle function definitions" in {
+  "The meta language parsers" should "handle function definitions" in {
     implicit val parserToTest = functionDefinition
     
     parsing("third[x]=car[cdr[cdr[x]]]") should equal(Fun(Var("third"), List(Var("x")),
@@ -50,22 +50,28 @@ class MetaLanguage extends FlatSpecForParsers with MetaLanguageParsers {
                     T,
                     FunCall("ff", List(CarOf(Var("x"))))))))
   }
-  
+
+  val lambdaExpression = Lambda(
+    List(Var("x")),
+    Cond(List(
+      CondElem(
+        AtomP(Var("x")),
+        Var("x")),
+      CondElem(
+        T,
+        FunCall("ff", List(CarOf(Var("x"))))))))
+
   they should "parse lambda notation" in {
-    implicit val parserToTest = lambdaNotation;
+    implicit val parserToTest = lambdaNotation
     val expr = "λ[[x];[atom[x]→x; T→ff[car[x]]]]"
- 
-    (parsing(expr)) should equal(
-        Lambda(
-            List(Var("x")),
-            Cond(List(
-                CondElem(
-                    AtomP(Var("x")),
-                    Var("x")),
-                CondElem(
-                    T,
-                    FunCall("ff", List(CarOf(Var("x"))))))))) // <-- see? Lisp! ;-)
+
+    (parsing(expr)) should equal(lambdaExpression)
   }
-  
-  // Next up: label[ff;λ[[x];[atom[x]→x; T→ff[car[x]]]]]
+
+  they should "parse label expressions" in {
+    implicit val parserToTest = labelNotation
+    val expr = "label[ff;λ[[x];[atom[x]→x; T→ff[car[x]]]]]"
+    (parsing(expr)) should equal(Label("ff", lambdaExpression))
+
+  }
 }

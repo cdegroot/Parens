@@ -24,5 +24,9 @@ trait MetaLanguageParsers extends ElementaryFunctionParsers {
   def lambdaNotation: Parser[Lambda] = "λ[[" ~> repsep(variable, elem(';')) ~ "];" ~ funOrSexp <~ "]" ^^ {
     case args~sep~body => Lambda(args, body)
   }
+
+  def labelNotation: Parser[Label] = "label[" ~> variable ~ elem(';') ~ lambdaNotation <~ "]" ^^ {
+    case Var(label)~sep~lambda => Label(label, lambda)
+  }
   		
 }
