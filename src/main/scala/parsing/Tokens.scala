@@ -19,28 +19,14 @@ object Tokens {
 	val NIL = Atom("NIL")
 	
 	case class Var(name: String) extends Token { 
-	  def eval(bindings: Context) = trace (this, bindings) { bindings(name) match {
-      case Some(expr) => expr.eval(bindings)
-      case None => throw new RuntimeException("Could not eval " + this)
-    }}
-	}
-	
-	case class Binding(name: String, value: Token)
-  case class Context(bindings: List[Binding]) {
-    def ++(tuples: List[(Var, Token)]) = {
-      // TODO cleanup this mess. Directly use tuples instead of bindings?
-      val newMap = bindingMap.toSeq ++ tuples.map(tuple => tuple match {
-        case (variable, token) => (variable.name, token)
-      })
-      Context(newMap.map(tuple => tuple match {
-        case (name, token) => Binding(name, token)
-      }).toList)
+	  def eval(bindings: Context) = trace (this, bindings) { bindings.get(name) match {
+        case Some(expr) => expr.eval(bindings)
+        case None => Var(name)
+      }
     }
+	}
 
-    val bindingMap = bindings.map(binding => (binding.name, binding.value)).toMap
-    def apply(name: String) = bindingMap.get(name)
-    def apply(variable: Var) = bindingMap.get(variable.name)
-  }
+  type Context = Map[String, Token]
 
 	// elementary functions
 	abstract class ElementaryFunction extends Token
@@ -100,14 +86,14 @@ object Tokens {
     def eval(bindings: Context) = trace(this, bindings) { NIL }
   }
 
-  case class Fun(name: Var, arguments: List[Var], body: Token) extends Token {
+  case class Fun(name: String, arguments: List[String], body: Token) extends Token {
     def eval(bindings: Context): Token = trace (this, bindings) { body.eval(bindings) }
   }
 
   // a function call.
 	case class FunCall(name: String, args: List[Token]) extends Token {
 	  def eval(bindings: Context) = trace (this, bindings) {
-      val fun = bindings(name).get.asInstanceOf[Fun]
+      val fun = bindings(name).asInstanceOf[Fun]
       val boundArgs = fun.arguments.zip(args.map(arg => arg.eval(bindings)))
       fun.body.eval(bindings ++ boundArgs)
 
