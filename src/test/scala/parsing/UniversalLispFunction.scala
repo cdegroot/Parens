@@ -81,4 +81,18 @@ class UniversalLispFunction extends FlatSpecForParsers with MetaLanguageParsers 
     val ctx = buildContextFrom(equal, subst, nul, append, member, pairlis, assoc)
     parsing("assoc[B;((A.(M N)), (B .(CAR X)), (C .(QUOTE M)), (C .(CDR X)))]").eval(ctx) should equal(parsing("(B . (CAR X))")(sexp))
   }
+
+  val sub2 = "sub2[a;z] = [" +
+    "null[a]→z;" +
+    "eq[caar[a];z]→cdar[a];" +
+    "T→sub2[cdr[a];z]]"
+  val sublis =  "sublis[a;y] = " +
+    "[atom[y]→sub2[a;y];" +
+    "T→cons[sublis[a;car[y]];sublis[a;cdr[y]]]]"
+
+  they should "parse the definition of sublis" in {
+    val ctx = buildContextFrom(equal, subst, nul, append, member, pairlis, assoc, sub2, sublis)
+    parsing("sublis[((X . SHAKESPEARE) (Y . (THE TEMPEST)));(X WROTE Y)]").eval(ctx) should  equal(parsing("(SHAKESPEARE WROTE (THE TEMPEST))"))
+  }
+
 }
