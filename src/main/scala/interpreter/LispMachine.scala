@@ -1,6 +1,9 @@
 package interpreter
 
+import javax.naming.Context
+
 object LispMachine {
+
   // The expressions building up the universal Lisp Function, and some easy
   // to handle chunks for unit testing :)
 
@@ -70,5 +73,6 @@ object LispMachine {
     "T       → cons[eval[car[m];a];evlis[cdr[m];a]]]"
 
   val exprsForEvalquote = exprsForSublis ++ Seq(evalquote, apply, eval, evcon, evlis)
+
 
 }

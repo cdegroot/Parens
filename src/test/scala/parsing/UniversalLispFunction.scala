@@ -1,20 +1,14 @@
 package parsing
 
 import parsing.Tokens.{Token, Atom, Context, EmptyContext}
-import interpreter.LispMachine
+import interpreter.{LispInterpreterParser, LispMachine}
+import interpreter.LispInterpreterParser.buildContextFrom
 
 class UniversalLispFunction extends FlatSpecForParsers with MetaLanguageParsers {
   implicit val parserToTest = funOrSexp
 
   // Note that we skip the M->S rewriting on page 10. We keep our meta language
   // parser around to directly parse M-exps (probably "for now")
-
-  def buildContextFrom(exps: Seq[String]): Context = {
-    exps.foldLeft(EmptyContext)((ctx, exp) => {
-      val fun = parsing(exp)(functionDefinition)
-      ctx + (fun.name -> fun)
-    })
-  }
 
   def evaluating(expr: String)(implicit context: Context): Token = parsing(expr)(parserToTest).eval(context)
 
