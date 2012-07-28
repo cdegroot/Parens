@@ -15,7 +15,11 @@ class UniversalLispFunction extends FlatSpecForParsers with MetaLanguageParsers 
     })
   }
 
-  val equal = "equal[x;y]=[atom[x]→[atom[y]→eq[x;y]; T→F]; equal[car[x];car[y]]→equal[cdr[x];cdr[y]];T→F]"
+  val equal = "equal[x;y]=[" +
+    "atom[x]→[atom[y]→eq[x;y]; T→F];" +
+    "atom[y]→F;" + // BUG in the original paper.
+    "equal[car[x];car[y]]→equal[cdr[x];cdr[y]];" +
+    "T→F]"
 
   "The meta language parsers" should "parse the definition of equal" in {
     val ctx = buildContextFrom(equal)
@@ -45,7 +49,17 @@ class UniversalLispFunction extends FlatSpecForParsers with MetaLanguageParsers 
   val append = "append[x;y]=[null[x]→y;T→cons[car[x];append[cdr[x];y]]]"
 
   they should "parse the definition of append" in {
-    val ctx = buildContextFrom(equal, nul, append)
+    val ctx = buildContextFrom(equal, subst, nul, append)
     parsing("append[(A B);(C D E)]").eval(ctx) should equal(parsing("(A B C D E)")(sexp))
+  }
+
+  val member = "member[x;y]=[" +
+    "null[y] → F;" +
+    "equal[x;car[y]] → T;" +
+    "T → member[x;cdr[y]]]"
+
+  they should "parse the definition of member" in {
+    val ctx = buildContextFrom(equal, subst, nul, append, member)
+    parsing("member[(A B);(C D (A B) E)]").eval(ctx) should equal(Tokens.T)
   }
 }
