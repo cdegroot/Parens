@@ -4,14 +4,22 @@ object Tokens {
   
 	sealed abstract class Token {
 	  def eval(bindings: Context) : Token
+    def isAtomic = false
 	} 
 	
 	abstract class BaseSexp extends Token
 	case class Atom(name: String) extends BaseSexp {
 	  def eval(bindings: Context) = trace (this, bindings) { this }
+    override def isAtomic = true
 	}
 	case class Sexp(car: Token, cdr: Token) extends BaseSexp {
-	  def eval(bindings: Context) = trace (this, bindings) { Sexp(car.eval(bindings), cdr.eval(bindings)) }
+	  def eval(bindings: Context) = trace (this, bindings) {
+      if (car.isAtomic && cdr.isAtomic)
+        this
+      else
+        Sexp(car.eval(bindings), cdr.eval(bindings))
+    }
+    override lazy val isAtomic = car.isAtomic && cdr.isAtomic
 	}
 	
 	val T = Atom("T")
@@ -20,7 +28,7 @@ object Tokens {
 	
 	case class Var(name: String) extends Token { 
 	  def eval(bindings: Context) = trace (this, bindings) { bindings.get(name) match {
-        case Some(expr) => expr.eval(bindings)
+        case Some(expr) => expr
         case None => Var(name)
       }
     }

@@ -37,9 +37,15 @@ class UniversalLispFunction extends FlatSpecForParsers with MetaLanguageParsers 
   val nul = "null[x]=[equal[x;NIL]→T;T→F]"
 
   they should "parse the definition of null" in {
-    val ctx = buildContextFrom(equal, nul)
+    val ctx = buildContextFrom(equal, subst, nul)
     parsing("null[(A . B)]").eval(ctx) should equal(Tokens.F)
     parsing("null[NIL]").eval(ctx) should equal(Tokens.T)
   }
 
+  val append = "append[x;y]=[null[x]→y;T→cons[car[x];append[cdr[x];y]]]"
+
+  they should "parse the definition of append" in {
+    val ctx = buildContextFrom(equal, nul, append)
+    parsing("append[(A B);(C D E)]").eval(ctx) should equal(parsing("(A B C D E)")(sexp))
+  }
 }
