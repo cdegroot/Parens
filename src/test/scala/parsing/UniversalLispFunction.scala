@@ -1,6 +1,6 @@
 package parsing
 
-import parsing.Tokens.{Context, EmptyContext}
+import parsing.Tokens.{Atom, Context, EmptyContext}
 
 class UniversalLispFunction extends FlatSpecForParsers with MetaLanguageParsers {
   implicit val parserToTest = funOrSexp
@@ -98,6 +98,39 @@ class UniversalLispFunction extends FlatSpecForParsers with MetaLanguageParsers 
   they should "parse the definition of sublis" in {
     val ctx = buildContextFrom(exprsForSublis)
     parsing("sublis[((X . SHAKESPEARE) (Y . (THE TEMPEST)));(X WROTE Y)]").eval(ctx) should  equal(parsing("(SHAKESPEARE WROTE (THE TEMPEST))"))
+  }
+
+  // Finishing off with the main juice
+  val evalquote = "evalquote[fn;x] = apply[fn;x;NIL]"
+  val apply = "apply[fn;x;a]=[" +
+    "atom[fn] → [eq[fn;CAR] → caar[x];" +
+    "            eq[fn;CDR] → cdr[x];" +
+    "            eq[fn;CONS]→ cons[car[x];cadr[x]];" +
+    "            eq[fn;ATOM]→ atom[car[x]];" +
+    "            eq[fn;EQ]  → eq[car[x];cadr[x]];" +
+    "            T          → apply[eval[fn;a];x;a]];" +
+    "eq[car[fn];LAMBDA] → eval[caddr[fn];pairlis[cadr[fn];x;a]];" +
+    "eq[car[fn];LABEL]  → aply[caddr[fn];x;cons[cons[cadr[fn];caddr[fn]];a]]]"
+  val eval = "eval[e;a] = [" +
+    "atom[e]      → cdr[assoc[e;a]];" +
+    "atom[car[e]] → [" +
+    "       eq[car[e];QUOTE] → cadr[e];" +
+    "       eq[car[e];COND]  → evcon[cdr[e];a];" +
+    "       T                → apply[car[e];evlis[cdr[e];a];a]];" +
+    "T            → apply[car[e];evlis[cdr[e];a];a]]"
+  val evcon = "evcon[c;a] = [" +
+    "eval[caar[c];a] → eval[cadar[c];a];" +
+    "T               → evcon[cdr[c];a]]"
+  val evlis = "evlis[m;a] = [" +
+    "null[m] → NIL;" +
+    "T       → cons[eval[car[m];a];evlis[cdr[m];a]]]"
+
+  val exprsForEvalquote = exprsForSublis ++ Seq(evalquote, apply, eval, evcon, evlis)
+
+  they should "parse evalquote" in {
+    val ctx = buildContextFrom(exprsForEvalquote)
+    parsing("evalquote[CAR;((A B))]").eval(ctx) should equal(Atom("A")) // Trivial test case to check for typos :-)
+    parsing("evalquote[(LAMBDA (X Y) (CONS (CAR X ) Y)); ((A B) (C D))]").eval(ctx) should equal(parsing("(A C D)")(sexp))
   }
 
 }
