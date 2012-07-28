@@ -129,8 +129,8 @@ class UniversalLispFunction extends FlatSpecForParsers with MetaLanguageParsers 
 
   they should "parse evalquote" in {
     val ctx = buildContextFrom(exprsForEvalquote)
-    parsing("evalquote[CAR;((A B))]").eval(ctx) should equal(Atom("A")) // Trivial test case to check for typos :-)
-    parsing("evalquote[(LAMBDA (X Y) (CONS (CAR X ) Y)); ((A B) (C D))]").eval(ctx) should equal(parsing("(A C D)")(sexp))
+
+    parsing("evalquote[(LAMBDA (X Y) (CONS (CAR X) Y)); ((A B) (C D))]").eval(ctx) should equal(parsing("(A C D)")(sexp))
   }
 
 }
