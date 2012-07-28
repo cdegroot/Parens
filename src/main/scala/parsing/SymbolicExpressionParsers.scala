@@ -10,9 +10,11 @@ trait SymbolicExpressionParsers extends RegexParsers {
 
   // List notation
   
-  def list: Parser[Token] = "(" ~> rep1sep(sexp, elem(' ')) <~ ")" ^^ {
+  def list: Parser[Token] = "(" ~> rep1sep(sexp, sexpSep) <~ ")" ^^ {
     case sexps => listToDots(sexps)
   }
+
+  def sexpSep = elem(' ') | elem(',') ~ elem(' ')
     
   def listToDots(sexps: List[Token]) : Sexp = sexps match {
     case x :: Nil => Sexp(x, NIL)
