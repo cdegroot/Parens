@@ -28,5 +28,5 @@ trait MetaLanguageParsers extends ElementaryFunctionParsers {
   def labelNotation: Parser[Label] = "label[" ~> variable ~ elem(';') ~ lambdaNotation <~ "]" ^^ {
     case Var(label)~sep~lambda => Label(label, lambda)
   }
-  		
+
 }

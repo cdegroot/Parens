@@ -35,7 +35,7 @@ class ParsingSymbolicExpressions extends FlatSpecForParsers with SymbolicExpress
 }
 
 class ElementaryFunctions extends FlatSpecForParsers with ElementaryFunctionParsers {
-  def none = Map[String, Token]()
+  def none = EmptyContext
   
   // 
   // Section 1.2 : Elementary Functions
@@ -102,7 +102,7 @@ class ElementaryFunctions extends FlatSpecForParsers with ElementaryFunctionPars
 }
 
 class ParsingListNotation extends FlatSpecForParsers with ElementaryFunctionParsers {
-  def none = Map[String, Token]()
+  def none = EmptyContext
 
   //
   // Section 1.3 : List notation

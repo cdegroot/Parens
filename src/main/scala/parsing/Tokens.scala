@@ -27,6 +27,8 @@ object Tokens {
 	}
 
   type Context = Map[String, Token]
+  def Context(elems: (String, Token)*) = elems.toMap
+  val EmptyContext: Context = Map()
 
 	// elementary functions
 	abstract class ElementaryFunction extends Token
@@ -36,13 +38,15 @@ object Tokens {
 	case class CdrOf(exp: Token) extends ElementaryFunction {
 	  def eval(bindings: Context) = trace (this, bindings) { exp.eval(bindings) match {
 	    case sexp:Sexp => sexp.cdr.eval(bindings)
-	    case _ => throw new Exception("cdr only defined on sexps")
+      case NIL => NIL
+	    case x => throw new Exception("cdr only defined on sexps, got " + x)
 	  }
 	}}
 	case class CarOf(exp: Token) extends ElementaryFunction {
 	  def eval(bindings: Context) = trace (this, bindings) { exp.eval(bindings) match {
 	    case sexp:Sexp => sexp.car.eval(bindings)
-	    case _ => throw new Exception("cdr only defined on sexps")
+      case NIL => NIL
+	    case x => throw new Exception("car only defined on sexps, got " + x)
 	  }
 	}}
 
