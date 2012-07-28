@@ -62,4 +62,14 @@ class UniversalLispFunction extends FlatSpecForParsers with MetaLanguageParsers 
     val ctx = buildContextFrom(equal, subst, nul, append, member)
     parsing("member[(A B);(C D (A B) E)]").eval(ctx) should equal(Tokens.T)
   }
+
+  val pairlis = "pairlis[x;y;a] = [" +
+    "null[x]→a; " +
+    "T→cons[cons[car[x]; car[y]]; " +
+    "pairlis[cdr[x]; cdr[y]; a]]]"
+
+  they should "parse the definition of pairlis" in {
+    val ctx = buildContextFrom(equal, subst, nul, append, member, pairlis)
+    parsing("pairlis[(A B C);(U V W);((D . X) (E . Y))]").eval(ctx) should equal(parsing("((A . U) (B . V) (C . W) (D . X) (E . Y))")(sexp))
+  }
 }
