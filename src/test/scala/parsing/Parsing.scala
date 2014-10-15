@@ -27,9 +27,9 @@ class ParsingSymbolicExpressions extends FlatSpecForParsers with SymbolicExpress
     parsing("((A1 . A2) . B)") should equal(Sexp(Sexp(Atom("A1"), Atom("A2")), Atom("B")))
     parsing("((U . V) . (X . Y))") should equal(Sexp(Sexp(Atom("U"), Atom("V")), Sexp(Atom("X"), Atom("Y"))))
     parsing("((U . V) . (X . (Y . Z)))") should 
-    	equal(Sexp(
-    			Sexp(Atom("U"), Atom("V")), 
-    			Sexp(Atom("X"), Sexp(Atom("Y"), Atom("Z"))))) 
+        equal(Sexp(
+                Sexp(Atom("U"), Atom("V")), 
+                Sexp(Atom("X"), Sexp(Atom("Y"), Atom("Z"))))) 
   }
   
 }

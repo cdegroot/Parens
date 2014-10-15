@@ -18,6 +18,6 @@ trait SymbolicExpressionParsers extends RegexParsers {
     
   def listToDots(sexps: List[Token]) : Sexp = sexps match {
     case x :: Nil => Sexp(x, NIL)
-  	case x :: xs  => Sexp(x, listToDots(xs))  	
+      case x :: xs  => Sexp(x, listToDots(xs))      
   }  
 }

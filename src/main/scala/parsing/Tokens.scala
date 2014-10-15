@@ -2,96 +2,96 @@ package parsing
 
 object Tokens {
   
-	sealed abstract class Token {
-	  def eval(bindings: Context) : Token
+    sealed abstract class Token {
+      def eval(bindings: Context) : Token
     def isAtomic = false
-	} 
-	
-	abstract class BaseSexp extends Token
-	case class Atom(name: String) extends BaseSexp {
-	  def eval(bindings: Context) = trace (this, bindings) { this }
+    } 
+    
+    abstract class BaseSexp extends Token
+    case class Atom(name: String) extends BaseSexp {
+      def eval(bindings: Context) = trace (this, bindings) { this }
     override def isAtomic = true
-	}
-	case class Sexp(car: Token, cdr: Token) extends BaseSexp {
-	  def eval(bindings: Context) = trace (this, bindings) {
+    }
+    case class Sexp(car: Token, cdr: Token) extends BaseSexp {
+      def eval(bindings: Context) = trace (this, bindings) {
       if (car.isAtomic && cdr.isAtomic)
         this
       else
         Sexp(car.eval(bindings), cdr.eval(bindings))
     }
     override lazy val isAtomic = car.isAtomic && cdr.isAtomic
-	}
-	
-	val T = Atom("T")
-	val F = Atom("F")
-	val NIL = Atom("NIL")
-	
-	case class Var(name: String) extends Token { 
-	  def eval(bindings: Context) = trace (this, bindings) { bindings.get(name) match {
+    }
+    
+    val T = Atom("T")
+    val F = Atom("F")
+    val NIL = Atom("NIL")
+    
+    case class Var(name: String) extends Token { 
+      def eval(bindings: Context) = trace (this, bindings) { bindings.get(name) match {
         case Some(expr) => expr
         case None => Var(name)
       }
     }
-	}
+    }
 
   type Context = Map[String, Token]
   def Context(elems: (String, Token)*) = elems.toMap
   val EmptyContext: Context = Map()
 
-	// elementary functions
-	abstract class ElementaryFunction extends Token
-	case class Cons(left: Token, right: Token) extends ElementaryFunction {
-	  def eval(bindings: Context) = trace (this, bindings) { Sexp(left.eval(bindings), right.eval(bindings)) }
-	}
-	case class CdrOf(exp: Token) extends ElementaryFunction {
-	  def eval(bindings: Context) = trace (this, bindings) { exp.eval(bindings) match {
-	    case sexp:Sexp => sexp.cdr.eval(bindings)
+    // elementary functions
+    abstract class ElementaryFunction extends Token
+    case class Cons(left: Token, right: Token) extends ElementaryFunction {
+      def eval(bindings: Context) = trace (this, bindings) { Sexp(left.eval(bindings), right.eval(bindings)) }
+    }
+    case class CdrOf(exp: Token) extends ElementaryFunction {
+      def eval(bindings: Context) = trace (this, bindings) { exp.eval(bindings) match {
+        case sexp:Sexp => sexp.cdr.eval(bindings)
       case NIL => NIL
-	    case x => throw new Exception("cdr only defined on sexps, got " + x)
-	  }
-	}}
-	case class CarOf(exp: Token) extends ElementaryFunction {
-	  def eval(bindings: Context) = trace (this, bindings) { exp.eval(bindings) match {
-	    case sexp:Sexp => sexp.car.eval(bindings)
+        case x => throw new Exception("cdr only defined on sexps, got " + x)
+      }
+    }}
+    case class CarOf(exp: Token) extends ElementaryFunction {
+      def eval(bindings: Context) = trace (this, bindings) { exp.eval(bindings) match {
+        case sexp:Sexp => sexp.car.eval(bindings)
       case NIL => NIL
-	    case x => throw new Exception("car only defined on sexps, got " + x)
-	  }
-	}}
+        case x => throw new Exception("car only defined on sexps, got " + x)
+      }
+    }}
 
-	// elementary predicates
-	case class EqP(left: Token, right: Token) extends ElementaryFunction {
-	  def eval(bindings: Context) = trace (this, bindings) {
+    // elementary predicates
+    case class EqP(left: Token, right: Token) extends ElementaryFunction {
+      def eval(bindings: Context) = trace (this, bindings) {
       val leftEvaled = left.eval(bindings)
       val rightEvaled = right.eval(bindings)
-	    if (!(leftEvaled.isInstanceOf[Atom] && rightEvaled.isInstanceOf[Atom])) {
-	      throw new Exception("eq is only defined for atoms")
-	    }
-	    if (leftEvaled == rightEvaled) T else F
-	  }
-	}
-	
-	case class AtomP(value: Token) extends ElementaryFunction {
-	  def eval(bindings: Context) = trace (this, bindings) { if (value.eval(bindings).isInstanceOf[Atom]) T else F }
-	}
+        if (!(leftEvaled.isInstanceOf[Atom] && rightEvaled.isInstanceOf[Atom])) {
+          throw new Exception("eq is only defined for atoms")
+        }
+        if (leftEvaled == rightEvaled) T else F
+      }
+    }
+    
+    case class AtomP(value: Token) extends ElementaryFunction {
+      def eval(bindings: Context) = trace (this, bindings) { if (value.eval(bindings).isInstanceOf[Atom]) T else F }
+    }
 
-	// conditional expression
-	case class Cond(clauses: List[CondElem]) extends Token {
-	  def eval(bindings: Context) = trace(this, bindings) {
+    // conditional expression
+    case class Cond(clauses: List[CondElem]) extends Token {
+      def eval(bindings: Context) = trace(this, bindings) {
       clauses.find(clause => clause.eval(bindings) == T).getOrElse(NIL_COND).action.eval(bindings)
     }
 
-	}
-	case class CondElem(condition: Token, action: Token) extends Token {
-	  def eval(bindings: Context) = trace(this, bindings) {
+    }
+    case class CondElem(condition: Token, action: Token) extends Token {
+      def eval(bindings: Context) = trace(this, bindings) {
       condition.eval(bindings)
     }
-	}
+    }
   object NIL_COND extends CondElem(T, NIL)
-	
-	// lambda notation
-	case class Lambda(args: List[Var], body: Token) extends Token {
-	  def eval(bindings: Context) = trace(this, bindings) { NIL }
-	}
+    
+    // lambda notation
+    case class Lambda(args: List[Var], body: Token) extends Token {
+      def eval(bindings: Context) = trace(this, bindings) { NIL }
+    }
 
   // label notation
   case class Label(name: String, expression: Lambda) extends Token {
@@ -103,14 +103,14 @@ object Tokens {
   }
 
   // a function call.
-	case class FunCall(name: String, args: List[Token]) extends Token {
-	  def eval(bindings: Context) = trace (this, bindings) {
+    case class FunCall(name: String, args: List[Token]) extends Token {
+      def eval(bindings: Context) = trace (this, bindings) {
       val fun = bindings(name).asInstanceOf[Fun]
       val boundArgs = fun.arguments.zip(args.map(arg => arg.eval(bindings)))
       fun.body.eval(bindings ++ boundArgs)
 
     }
-	}
+    }
   var indent = 0
   val SOFT_STACK_LIMIT = 40
   val VERBOSE_TRACING = false

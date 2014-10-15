@@ -5,7 +5,7 @@ import parsing.Tokens._
 trait ElementaryFunctionParsers extends SymbolicExpressionParsers {
 
   def cons: Parser[ElementaryFunction] = "cons" ~ "[" ~> funOrSexp ~ ";" ~ funOrSexp <~ "]" ^^ { 
-    							case x~semicolon~y => Cons(x,y) }
+                                case x~semicolon~y => Cons(x,y) }
   
   def car: Parser[ElementaryFunction] = "car" ~ "[" ~> funOrSexp <~ "]" ^^ { case x => CarOf(x) }
 
@@ -21,7 +21,7 @@ trait ElementaryFunctionParsers extends SymbolicExpressionParsers {
   } 
   
   def eqPredicate: Parser[Token] = "eq" ~ "[" ~> funOrSexp ~ ";" ~ funOrSexp <~ "]" ^^ {
-    							case left~semicolon~right => EqP(left, right) }
+                                case left~semicolon~right => EqP(left, right) }
   
   def atomPredicate: Parser[Token] = "atom" ~ "[" ~> funOrSexp <~ "]" ^^ { case x => AtomP(x) }
   

@@ -42,7 +42,7 @@ class MetaLanguage extends FlatSpecForParsers with MetaLanguageParsers {
     parsing("ff[car[x]]")(functionCall) should equal(FunCall("ff", List(CarOf(Var("x")))))
     parsing("ff[car[x]]")(funOrSexp) should equal(FunCall("ff", List(CarOf(Var("x")))))
     parsing("[atom[x]→x; T→ff[car[x]]]")(conditionalExpression) should equal(
-    	Cond(List(
+        Cond(List(
                 CondElem(
                     AtomP(Var("x")),
                     Var("x")),
